@@ -626,12 +626,15 @@ extension vector<int64_t,2>:ITexelElement
 /// @param isMS Indicates whether the texture is a multisampled texture.
 /// @param sampleCount The number of samples of a multisampled texture.
 /// @param access The access mode of the texture. 0 for read-only, 1 for read-write, 2 for rasterizer-ordered, 3 for feedback.
-/// @param isShadow Indicates whether the texture is a shadow texture (for combined texture-sampler only).
+/// @param isShadow Indicates whether the texture is a depth texture (`isCombined==0`) or a shadow texture (`isCombined==1`).
 /// @param isCombined Indicates whether the texture is a combined texture-sampler.
 /// @param format The storage format of the texture. Users should specify the format using an `[format("...")]` attribute instead.
 /// @see `Texture1D`, `Texture2D`, `Texture3D`, `TextureCube`, `Texture1DArray`,
 /// `Texture2DArray`, `TextureCubeArray`, `Sampler1D`, `Sampler2D`, `Sampler3D`, `SamplerCube`, `Sampler1DArray`, `Sampler2DArray`, `SamplerCubeArray`,
-/// `Texture2DMS`, `Texture2DMSArray`, `RWTexture1D`, `RWTexture2D`, `RWTexture3D`, `RWTexture1DArray`, `RWTexture2DArray`,
+/// `Texture2DMS`, `Texture2DMSArray`,
+/// `DepthTexture1D`, `DepthTexture2D`, `DepthTextureCube`, `DepthTexture1DArray`, `DepthTexture2DArray`, `DepthTextureCubeArray`,
+/// `DepthTexture2DMS`, `DepthTexture2DMSArray`,
+/// `RWTexture1D`, `RWTexture2D`, `RWTexture3D`, `RWTexture1DArray`, `RWTexture2DArray`,
 /// `RWTexture2DMS`, `RWTexture2DMSArray`, `Buffer`, `RWBuffer`, `FeedbackTexture2D`, `FeedbackTexture2DArray`.
 /// @remarks
 /// HLSL texture types are implemented as typealiases to the builtin `_Texture` type. Users
