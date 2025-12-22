@@ -1,55 +1,108 @@
 Vector Types
 ------------
 
-A vector type is written as `vector<T, N>` and represents an `N`-element vector with elements of type `T`.
-The _element type_ `T` must be one of the built-in scalar types, and the _element count_ `N` must be a specialization-time constant integer.
-The element count must be between 2 and 4, inclusive.
+A `vector<T, N>` represents a vector of `N` elements of type `T` where:
+- `T` is a [fundamental scalar type](04-types-fundamental.md)
+- `N` is a [specialization-time constant integer](TODO-Generics.md) in range [1, 4] denoting the number of elements.
 
-A vector type allows subscripting of its elements like an array, but also supports element-wise arithmetic on its elements.
-_Element-wise arithmetic_ means mapping unary and binary operators over the elements of a vector to produce a vector of results:
+The default values for `T` and `N` are `float` and `4`. This is for backwards compatibility.
 
+An element of a vector is accessed as follows:
+- Using the subscription operator `[]` (index 0 denotes the first element)
+- Using the member access operator `.` where the elements are named `x`, `y`, `z`, `w`.
+
+Example:
 ```hlsl
-vector<int,4> a = { 1, 2, 30, 40 };
-vector<int,4> b = { 10, 20, 3, 4 };
+vector<int, 4> v = { 1, 2, 3, 4 };
 
--a; // yields { -1, -2, -30, -40 }
-a + b; // yields { 11, 22, 33, 44 }
-b / a; // yields { 10, 10, 0, 0 }
-a > b; // yields { false, false, true, true }
+int tmp;
+
+tmp = v[0]; // tmp is 1
+tmp = v.w;  // tmp is 4
+v[1] = 9;   // v is { 1, 9, 3, 4 };
 ```
 
-A vector type is laid out in memory as `N` contiguous values of type `T` with no padding.
-The alignment of a vector type may vary by target platforms.
-The alignment of `vector<T,N>` will be at least the alignment of `T` and may be at most `N` times the alignment of `T`.
+Multiple elements may be referenced by specifying two or more elements after the member access operator. This can be used to:
+- Extract multiple elements. The resulting type is a vector with the size equal to the number of selected elements. The same element may be specified multiple times.
+- Assign multiple elements using a vector with the size equal to the number of selected elements. The elements must be unique.
 
-As a convenience, Slang defines built-in type aliases for vectors of the built-in scalar types.
-E.g., declarations equivalent to the following are provided by the Slang core module:
-
+Example:
 ```hlsl
-typealias float4 = vector<float, 4>;
-typealias int8_t3 = vector<int8_t, 3>;
+vector<int, 4> v = { 1, 2, 3, 4 };
+
+int2 tmp2;
+int3 tmp3;
+
+tmp2 = v.xy;                   // tmp2 is { 1, 2 }
+tmp3 = v.xww;                  // tmp3 is { 1, 4, 4 }
+v.xz = vector<int, 2>(-1, -3); // v becomes { -1, 2, -3, 4 }
 ```
 
-### Legacy Syntax
+When applying an unary arithmetic operator, the operation applies to all vector elements.
 
-For compatibility with older codebases, the generic `vector` type includes default values for `T` and `N`, being declared as:
-
+Example:
 ```hlsl
-struct vector<T = float, let N : int = 4> { ... }
+vector<int, 4> v = { 1, 2, 3, 4 };
+
+vector<int, 4> tmp;
+tmp = -v;   // tmp is { -1, -2, -3, -4 };
 ```
 
-This means that the bare name `vector` may be used as a type equivalent to `float4`:
+When applying a binary arithmetic operator where the other operand is scalar, the operation applies to all vector elements with the scalar parameter.
 
+Example:
 ```hlsl
-// All of these variables have the same type
-vector a;
-float4 b;
-vector<float> c;
-vector<float, 4> d;
+vector<int, 4> v = { 1, 2, 3, 4 };
+
+vector<int, 4> tmp;
+tmp = v - 1;   // tmp is { 0, 1, 2, 3 };
+tmp = 4 - v;   // tmp is { 4, 3, 2, 1 };
 ```
 
-Matrix Types
-------------
+When applying a binary assignment operator where the right-hand operand is scalar, the assignment applies to all vector element with the scalar parameter.
+
+Example:
+```hlsl
+vector<int, 4> v = { 1, 2, 3, 4 };
+
+v += 1;     // v becomes { 2, 3, 4, 5 };
+v = 42;     // v becomes { 42, 42, 42, 42 };
+```
+
+When applying a binary arithmetic, assignment, or comparison operator with two vectors of same length, the operator is applied element-wise.
+
+Example:
+```hlsl
+vector<int, 4> v1 = { 1, 2, 3, 4 };
+vector<int, 4> v2 = { 5, 6, 7, 8 };
+
+vector<int, 4> tmp;
+tmp = v1;       // tmp is { 1, 2, 3, 4 };
+tmp = v1 + v2;  // tmp is { 6, 8, 10, 12 };
+tmp = v1 * v2;  // tmp is { 5, 12, 21, 32 };
+
+vector<bool, 4> cmpResult;
+cmpResult = (v1 == vector<int, 4>(1, 3, 2, 4)); // cmpResult is { true, false, false, true }
+
+v1 -= v2;       // v1 becomes { -4, -4, -4, -4 };
+```
+
+The memory layout of a vector type is `N` contiguous values of type `T` with no padding.
+
+The alignment of a vector type is target-defined. The alignment of `vector<T, N>` is at least the alignment of `T` and at most `N` times the alignment of `T`.
+
+Slang provides type aliases for all vectors between size 1 and 4 for fundamental scalar types. The type alias has name `<fundamental_type>N` where `<fundamental_type>` is one of the fundamental types and `N` is the vector length.
+
+Example:
+```hlsl
+float4 v = { 1.0f, 2.0f, 3.0f, 4.0f }; // vector<float, 4>
+int32_t2 i2 = { 1, 2 }; // vector<int, 2>
+bool3 b3 = { true, false, false }; // vector<bool, 3>
+```
+
+
+Matrix Types (TODO)
+-------------------
 
 A matrix type is written as `matrix<T, R, C>` and represents a matrix of `R` rows and `C` columns, with elements of type `T`.
 The element type `T` must be one of the built-in scalar types.

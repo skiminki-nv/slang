@@ -9,7 +9,7 @@ Types in Slang do not necessarily prescribe a single _layout_ in memory.
 The discussion of each type will specify any guarantees about layout it provides; any details of layout not specified here may depend on the target platform, compiler options, and context in which a type is used.
 
 * [4a - Fundamental Types](04-types-fundamental.md)
-* [4b - Vector and Matrix Types](04-types-vector.md)
+* [4b - Vector and Matrix Types](04-types-vector-and-matrix.md)
 * [4c - Structures and Interfaces](04-types-struct-and-interface.md)
 * [4d - Array types](04-types-array.md)
 * [4e - Opaque types](04-types-opaque.md)
