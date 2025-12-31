@@ -10,9 +10,11 @@ The discussion of each type will specify any guarantees about layout it provides
 
 * [4a - Fundamental Types](04-types-fundamental.md)
 * [4b - Vector and Matrix Types](04-types-vector-and-matrix.md)
-* [4c - Structures and Interfaces](04-types-struct-and-interface.md)
-* [4d - Array types](04-types-array.md)
-* [4e - Opaque types](04-types-opaque.md)
+* [4c - Structures](04-types-struct.md)
+* [4d - Interfaces](04-types-interface.md)
+* [4e - Extensions](04-types-extension.md)
+* [4f - Array types](04-types-array.md)
+* [4g - Opaque types](04-types-opaque.md)
 
 
 Known and Unknown Size
