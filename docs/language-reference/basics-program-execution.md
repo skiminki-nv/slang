@@ -1,3 +1,10 @@
 # Program Execution
 
-TODO
+## Compute 
+
+
+Compute:
+- Dispatch
+- Workgroup
+- Subgroup
+- Invocation
