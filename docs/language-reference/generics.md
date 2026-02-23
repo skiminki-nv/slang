@@ -1,7 +1,7 @@
 # Generics
 
 Generics in Slang enable compile-time parameterization of [structures](types-struct.md),
-[interfaces](types-interface.md), [type aliases (TODO)](types-alias.md), [functions and member functions](TODO.md),
+[interfaces](types-interface.md), [type aliases](types.md#alias), [functions and member functions](TODO.md),
 [subscript operators](types-struct.md#subscript-op), and
 [constructors](types-struct.md#constructor). Parameterization is allowed for types and
 `uint`/`int`/`bool`-typed values. In addition, Slang supports [generic structure
