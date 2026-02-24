@@ -185,6 +185,10 @@ Value parameters cannot be constrained.
 > 📝 **Remark 2:** Slang also has the `__generic` modifier, which can be used to declare generic parameters as
 > an alternative for *`generic-params-decl`*. Using *`generic-params-decl`* is recommended.
 
+> 📝 **Remark 3:** Optional conformance constraints are currently an experimental feature. See GitHub issues
+> [#10078](https://github.com/shader-slang/slang/issues/10078) and
+> [#10185](https://github.com/shader-slang/slang/issues/10185).
+
 
 ### Type Parameter Packs {#type-param-packs}
 
