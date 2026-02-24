@@ -726,5 +726,6 @@ return {
 	["IsCoopFloat"] = 724,
 	["Type.OptionalNoneType"] = 725,
 	["ReinterpretOptional"] = 726,
-	["LateRequireCapability"] = 727,
+	["Type.DefaultPushConstantLayout"] = 727,
+	["LateRequireCapability"] = 728,
 }
