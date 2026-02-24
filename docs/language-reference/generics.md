@@ -615,6 +615,7 @@ void main(uint3 id : SV_DispatchThreadID)
 
 ### Implicit parameter binding for type and value
 ```hlsl
+// Note: assumes N >= 1
 ElementType sumElements<ElementType : IArithmetic, let N : uint>
     (ElementType arr[N])
 {
@@ -632,7 +633,6 @@ RWStructuredBuffer<int> outputBuffer;
 void main(uint3 id : SV_DispatchThreadID)
 {
     int elements[7] = { 1,2,3,4,5,6,7 };
-    int empty[0] = { };
 
     // generic parameters ElementType and N are bound implicitly
     outputBuffer[0] = sumElements(elements);
