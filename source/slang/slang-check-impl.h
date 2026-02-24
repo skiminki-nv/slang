@@ -3247,6 +3247,8 @@ struct SemanticsStmtVisitor : public SemanticsVisitor, StmtVisitor<SemanticsStmt
 
     void visitExpressionStmt(ExpressionStmt* stmt);
 
+    void visitRequireCapabilityStmt(RequireCapabilityStmt* stmt);
+
     // Try to infer the max number of iterations the loop will run.
     void tryInferLoopMaxIterations(ForStmt* stmt);
 
