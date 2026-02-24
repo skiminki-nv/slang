@@ -7928,7 +7928,7 @@ struct StmtLoweringVisitor : StmtVisitor<StmtLoweringVisitor>
         auto builder = getBuilder();
 
         List<CapabilityName> capNames;
-        for (const Token &t : stmt->requiredCaps)
+        for (const Token& t : stmt->requiredCaps)
         {
             // note: capability names have already been validated
             capNames.add(findCapabilityName(t.getContent()));
