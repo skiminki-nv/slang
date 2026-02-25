@@ -207,7 +207,8 @@ An each-expression evaluates to a type parameter pack, tuple, or type-parameter-
 
 There must be at least one each-expression within an expand-expression. An each-expression must always be
 enclosed within an expand-expression except in a generic type declaration. If there are multiple
-each-expressions within an expand-expression, they must all have an equal number of type parameters.
+each-expressions within an expand-expression, the referred parameter packs must all have an equal number of
+parameters.
 
 An expand-expression evaluates to a comma-separated value sequence whose length is the number of type
 parameters of the embedded each-expressions. Each element of the sequence is the expand expression with every
@@ -229,20 +230,21 @@ multiple declared expand/each parameters, in which case the type parameter packs
 
 ## Type Checking
 
-Type checking of generic type parameters is performed based on their type constraints, and it is performed
-before instantiation. In general, an operation on a generic type or a generic-typed variable is legal if it is
+Type checking of parameterized types is performed based on their type constraints, and it is performed
+before instantiation. In general, an operation on a parameterized generic type or a generic-typed variable is legal if it is
 legal for all possible concrete types conforming to the declared constraints.
 
 The rules are as follows:
-- If a generic type parameter `T` has an equality constraint `T == U`, type `T` is considered to be type `U`
+- If a parameterized type `T` has a type equality constraint `T == U`, type `T` is considered to be type `U`
   for all intents and purposes.
-- If a generic type parameter `T` has a type conformance constraint `T : U`, type `T` is considered to conform to
+- If a parameterized type `T` has a type conformance constraint `T : U`, type `T` is considered to conform to
   `U`. That is, `T` implements all requirements of `U`.
-- If a generic type parameter `T` has a type constraint `U(T)`, type `T` may be converted to type `U`.
+- If a parameterized type `T` has a type constraint `U(T)`, type `T` may be converted to type `U`.
 
-Type constraints may also be declared for associated types. For example, `where T : IFace where T.AssocT
-== int` requires that `T.AssocT` is `int`. Note that `IFace` must declare associated type `AssocT`. (See
-[interfaces](types-interface.md) for associated type declarations.)
+Type constraints may be declared for generic type parameters and type expressions including generic type
+parameters. For example, `where T : IFace where T.AssocT == int` requires that `T.AssocT` is `int`. Note that
+`IFace` must declare associated type `AssocT`. (See [interfaces](types-interface.md) for associated type
+declarations.)
 
 No assumptions are made about generic value parameters other than their declared type.
 
@@ -275,7 +277,7 @@ If inference is ambiguous for a generic type parameter, the following rules are 
 It is an error when inference yields multiple options for a generic value argument.
 
 Mixing explicit and implicit parameter binding is allowed. The leftmost generic parameters use the provided
-explicit parameter bindings and the rest are inferred.
+generic arguments and the rest are inferred.
 
 > 📝 **Remark:** If the generic argument inference is ambiguous and `bool` is inferred as a fundamental
 > or element type, the behavior is currently undefined. See GitHub issue
@@ -590,7 +592,7 @@ void main(uint3 id : SV_DispatchThreadID)
 > 📝 **Remark:** An extension cannot currently be used to override a more generic implementation.
 > See GitHub issue [#10146](https://github.com/shader-slang/slang/issues/10146).
 
-### Explicit and implicit parameter binding
+### Explicit and implicit generic arguments
 
 ```hlsl
 // Return type Ret is listed first, since it cannot be
@@ -642,7 +644,7 @@ void main(uint3 id : SV_DispatchThreadID)
 }
 ```
 
-### Implicit parameter binding, ambiguous value parameter
+### Implicit parameter binding, ambiguous value argument
 ```hlsl
 uint len<let N : uint>(int[N] arr, int[N] arr2)
 {
@@ -657,12 +659,12 @@ void main(uint3 id : SV_DispatchThreadID)
     int arr1[7] = { };
     int arr2[6] = { };
 
-    // error: generic parameter N cannot be inferred
+    // error: generic argument N cannot be inferred
     outputBuffer[0] = len(arr1, arr2);
 }
 ```
 
-### Implicit parameter binding, ambiguous type parameter
+### Implicit parameter binding, ambiguous type argument
 ```hlsl
 interface IBase
 {
@@ -687,7 +689,7 @@ void main(uint3 id : SV_DispatchThreadID)
     B b = { };
 
     // Explicit parameter type binding must be used,
-    // since implicit type for T is ambiguous and
+    // since inferred type for T is ambiguous and
     // non-fundamental.
     testFunc<IBase>(a, b);
 }
