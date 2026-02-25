@@ -727,5 +727,9 @@ return {
 	["Type.OptionalNoneType"] = 725,
 	["ReinterpretOptional"] = 726,
 	["Type.DefaultPushConstantLayout"] = 727,
-	["LateRequireCapability"] = 728,
+	["Type.D3DConstantBufferLayout"] = 728,
+	["Type.MetalParameterBlockLayout"] = 729,
+	["Type.CUDALayout"] = 730,
+	["Type.LLVMLayout"] = 731,
+  ["LateRequireCapability"] = 732,
 }
