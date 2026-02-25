@@ -1,20 +1,19 @@
 # Generics
 
-Generics in Slang enable compile-time parameterization of [structures](types-struct.md),
+Generics in Slang enable parameterization of [structures](types-struct.md),
 [interfaces](types-interface.md), [type aliases](types.md#alias), [functions and member functions](TODO.md),
 [subscript operators](types-struct.md#subscript-op), and
 [constructors](types-struct.md#constructor). Parameterization is allowed for types and
 `uint`/`int`/`bool`-typed values. In addition, Slang supports [generic structure
 extension](types-extension.md#generic-struct) covered in [type extensions](types-extension.md).
 
-When a generic type or function is instantiated, the compile-time parameters are bound. An instantiated
-generic is a concrete type or function, which can be used as any other concrete type or
+When the generic parameters are bound, a generic type or function is instantiated. An instantiated
+generic is a concrete type or function, which can be used like any other concrete type or
 function. Conceptually, partial parameter binding can be done by defining a generic type alias for a generic
 object, but this does not instantiate a generic.
 
 Slang does not directly support specialization or partial specialization of generics. However, [generic struct
-extension](types-extension.md#generic-struct) can be used to extend generic structures much to the same
-effect.
+extension](types-extension.md#generic-struct) can be used to extend generic structures to similar effect.
 
 
 ## Syntax
@@ -36,13 +35,13 @@ Generic type alias syntax:
 > &nbsp;&nbsp;&nbsp;&nbsp;**`'='`** *`simple-type-spec`*<br>
 > &nbsp;&nbsp;&nbsp;&nbsp;(**`'where'`** *`where-clause`*)\* **`';'`**
 
-Generic function and member function declaration: (traditional syntax)
+Generic function and member function declaration (traditional syntax):
 > *`simple-type-spec`* *`identifier`* [*`generic-params-decl`*]<br>
 > &nbsp;&nbsp;&nbsp;&nbsp;**`'('`** *`param-list`* **`')'`**<br>
 > &nbsp;&nbsp;&nbsp;&nbsp;(**`'where'`** *`where-clause`*)\*<br>
 > &nbsp;&nbsp;&nbsp;&nbsp;(**`';'`** | **`'{'`** *`body-stmt`*\*  **`'}'`**)
 
-Generic function and member function declaration: (modern syntax)
+Generic function and member function declaration (modern syntax):
 > **`'func'`** *`identifier`* [*`generic-params-decl`*]<br>
 > &nbsp;&nbsp;&nbsp;&nbsp;**`'('`** *`param-list`* **`')'`**<br>
 > &nbsp;&nbsp;&nbsp;&nbsp;[**`'throws'`** *`simple-type-spec`*]<br>
@@ -120,14 +119,14 @@ Generic parameter conformance clause:
 ### Parameters
 
 - *`generic-params-decl`* declares a list of generic parameters.
-- *`generic-param-decl`* declares a generic value, type, or type parameter pack.
+- *`generic-param-decl`* declares a generic value parameter, type parameter, or type parameter pack.
 - *`generic-value-param-decl`* declares a generic value parameter.
 - *`generic-value-param-trad-decl`* declares a generic value parameter using traditional syntax.
 - *`generic-type-param-decl`* declares a generic type parameter.
 - *`generic-type-param-pack-decl`* declares a generic type parameter pack.
 - *`where-clause`* is a generic parameter conformance clause.
 - *`generic-type-constraint-decl`* is a generic parameter conformance clause, requiring the declared parameter
-  to be a subtype of one or more constraining type expressions.
+  to conform to one or more constraining type expressions.
 - *`generic-type-constraint-eq-decl`* is a generic parameter conformance clause, requiring the declared parameter
   to be equal to the constraining type expression.
 - *`generic-type-constraint-coercion-decl`* is a generic parameter conformance clause, requiring the declared parameter
@@ -143,47 +142,48 @@ Generic parameter conformance clause:
 
 ## Description
 
-A generic parameter declaration list *`generic-params-decl`* adds any number of compile-time parameters to
-structures and functions. These parameterized constructs are called *generic structures* and *generic
-functions*.
+A generic parameter declaration list *`generic-params-decl`* adds any number of parameters to structures,
+interfaces, type aliases, functions, subscript operators, and constructors. These parameterized constructs are
+called *generic structures*, *generic interfaces*, *generic type aliases*, *generic functions*, *generic
+subscript operators*, and *generic constructors*.
 
 A generic parameter declaration is one of:
 
 - Generic value parameter declaration *`generic-value-param-decl`*, which adds a value parameter with an optional
   default value. The value type must be one of `bool`, `int`, `uint`.
-- Generic type parameter declaration *`generic-type-param-decl`*, which adds a type parameter with optional
-  type constraint and default type. The keyword `typename` is optional.
+- Generic type parameter declaration *`generic-type-param-decl`*, which adds a type parameter with an optional
+  type constraint and an optional default type. The keyword `typename` is optional.
 - Generic type parameter pack declaration *`generic-type-param-pack-decl`*, which adds a type parameter
   pack. A type parameter pack is a variable-length list of types.
 
 Types may be constrained by:
 
-- Specifying an inline type constraint in *`generic-type-param-decl`* using the form `TypeParam :
-  ParentType`. This adds a single conformance requirement such that `TypeParam` must be a subtype of
-  `ParentType`.
+- Specifying an inline type constraint in *`generic-type-param-decl`* using the form
+  `TypeParam : ConstrainingType`. This adds a single conformance requirement such that `TypeParam` must conform to
+  `ConstrainingType`.
 - Specifying one or more `where` clauses (*`where-clause`*). A `where` clause adds a single requirement using
   one of the following forms:
-  - Conformance declaration *`generic-type-constraint-decl`* adds a requirement that the left-hand-side type
+  - Conformance constraint declaration *`generic-type-constraint-decl`* adds a requirement that the left-hand-side type
     expression must conform to the right-hand-side type expression.
-  - Equivalence declaration *`generic-type-constraint-eq-decl`* adds a requirement that the left-hand-side
+  - Equivalence constraint declaration *`generic-type-constraint-eq-decl`* adds a requirement that the left-hand-side
     type expression must be equal to the right-hand-side type expression.
-  - Coercion declaration *`generic-type-constraint-coercion-decl`* adds a requirement that the parenthesized
+  - Coercion constraint declaration *`generic-type-constraint-coercion-decl`* adds a requirement that the parenthesized
     type expression must be convertible to the left-hand-side type expression.
 
-Conformance and equivalence requirements may be declared as optional. When optional, expression `ParamType is
-ParentType` returns `true` when `ParamType` conforms to or equals `ParentType`. When the expression is used in
-an `if` statement using the form `if (ParamType is ParentType) { ... }`, then any variable of type `ParamType` may
-be used as type `ParentType` in the "then" branch.
+Conformance and equivalence constraints may be declared as optional. When optional, the expression `ParamType is
+ConstrainingType` returns `true` when `ParamType` conforms to or equals `ConstrainingType`. When the expression is used in
+an `if` statement using the form `if (ParamType is ConstrainingType) { ... }`, then any variable of type `ParamType` may
+be used as type `ConstrainingType` in the "then" branch.
 
 The coercion requirement is usable only in generic structure extensions.
 
 Value parameters cannot be constrained.
 
-> 📝 **Remark 1:** In Slang, a conformance requirement `TypeParam : ParentType` means that `TypeParam` must inherit
-> from `ParentType`, and `ParentType` must be an interface.
+> 📝 **Remark 1:** In Slang, a conformance requirement `TypeParam : ConstrainingType` means that `TypeParam` must
+> have `ConstrainingType` as a base (either directly or transitively), and `ConstrainingType` must be an interface.
 
 > 📝 **Remark 2:** Slang also has the `__generic` modifier, which can be used to declare generic parameters as
-> an alternative for *`generic-params-decl`*. Using *`generic-params-decl`* is recommended.
+> an alternative to *`generic-params-decl`*. Using *`generic-params-decl`* is recommended.
 
 > 📝 **Remark 3:** Optional conformance constraints are currently an experimental feature. See GitHub issues
 > [#10078](https://github.com/shader-slang/slang/issues/10078) and
@@ -192,10 +192,10 @@ Value parameters cannot be constrained.
 
 ### Type Parameter Packs {#type-param-packs}
 
-A type parameter pack is declared using the `each TypeIdentifier` syntax. When a generic construct is instantiated, the
-parameter pack is bound with a (possibly empty) sequence of types.
+A type parameter pack is declared using the `each TypeIdentifier` syntax. When a generic construct is
+instantiated, a (possibly empty) sequence of type arguments is bound to the parameter pack.
 
-A type parameter pack is expanded using the `expand`/`each` construct using the following syntax:
+A type parameter pack is expanded using the `expand`/`each` construct with the following syntax:
 
 > Expand-expression:<br>
 > &nbsp;&nbsp;&nbsp;&nbsp;*`expand-expr`* = **`'expand'`** *`expr`*
@@ -203,15 +203,15 @@ A type parameter pack is expanded using the `expand`/`each` construct using the 
 > Each-expression:<br>
 > &nbsp;&nbsp;&nbsp;&nbsp;*`each-expr`* = **`'each'`** *`expr`*
 
-An each-expression evaluates to a type parameter pack, tuple, or a type-parameter-pack-typed variable.
+An each-expression evaluates to a type parameter pack, tuple, or type-parameter-pack-typed variable.
 
 There must be at least one each-expression within an expand-expression. An each-expression must always be
 enclosed within an expand-expression except in a generic type declaration. If there are multiple
 each-expressions within an expand-expression, they must all have an equal number of type parameters.
 
 An expand-expression evaluates to a comma-separated value sequence whose length is the number of type
-parameters of the embedded each-expressions. The sequence elements are the expand expressions with
-each-expressions substituted by the Nth element of the evaluated tuple or a type-parameter-pack-typed variable.
+parameters of the embedded each-expressions. Each element of the sequence is the expand expression with every
+embedded each-expression replaced by the Nth element of its corresponding pack.
 
 That is, `expand-expr` is substituted with the following sequence:
 
@@ -236,49 +236,48 @@ legal for all possible concrete types conforming to the declared constraints.
 The rules are as follows:
 - If a generic type parameter `T` has an equality constraint `T == U`, type `T` is considered to be type `U`
   for all intents and purposes.
-- If a generic type parameter `T` has a type constraint `T : Parent`, type `T` is considered to be a subtype
-  of `Parent`. That is, all inherited members of `Parent` are accessible via generic type parameter `T`.
+- If a generic type parameter `T` has a type conformance constraint `T : U`, type `T` is considered to conform to
+  `U`. That is, `T` implements all requirements of `U`.
 - If a generic type parameter `T` has a type constraint `U(T)`, type `T` may be converted to type `U`.
 
-Type constraints may be declared also for the associated types. For example, `where T : Parent where T.AssocT
-== int` requires that `AssocT` is `int`. Note that `Parent` must declare associated type `AssocT`. (See
+Type constraints may also be declared for associated types. For example, `where T : IFace where T.AssocT
+== int` requires that `T.AssocT` is `int`. Note that `IFace` must declare associated type `AssocT`. (See
 [interfaces](types-interface.md) for associated type declarations.)
 
 No assumptions are made about generic value parameters other than their declared type.
 
 
-> 📝 **Remark:** In contrast to C++ templates, type checking of Slang generics is performed before the
-> compile-time parameters are bound. In C++, type checking is performed during template instantiation.
+> 📝 **Remark:** In contrast to C++ templates, type checking of Slang generics is performed before
+> instantiation. In C++, type checking is performed after template instantiation.
 
 
 ## Parameter Binding
 
-Compile-time parameters for a generic can be bound either explicitly, implicitly, or as a combination of
-both. Binding is done at the call site.
+Arguments to generic parameters can be bound explicitly, implicitly, or as a combination of both. Binding is
+done at the call site.
 
-In explicit binding, the generic parameters are listed in angle brackets after the generic type or function
+In explicit binding, the arguments to the generic parameters are listed in angle brackets after the generic type or function
 identifier. Explicit binding cannot be used in constructs that do not use a named identifier at call sites
 (e.g., operator overloading).
 
-In implicit binding, generic parameters are inferred. Inference is performed by matching the generic
-parameters against the call site parameter types. It is an error if a parameter cannot be inferred from the
-call site.
+In implicit binding, the arguments to the generic parameters are inferred. Inference is performed by matching the generic
+parameters against the call site argument expressions. It is an error if an argument to a generic parameter cannot
+be inferred from the call site.
 
-In case generic parameter inference is ambiguous for a type parameter, the following rules are used
-to determine the type:
-- In case all inferred types are [fundamental scalar types](types-fundamental.md#scalar) or
+If inference is ambiguous for a generic type parameter, the following rules are used to determine the type:
+- If all inferred types are [fundamental scalar types](types-fundamental.md#scalar) or
   [vector types](types-vector-and-matrix.md) of the same length, the element type with the highest promotion rank is
   used. The promotion ranks from the lowest to the highest are: `int8_t`, `uint8_t`, `int16_t`,
   `uint16_t`, `int32_t`, `uint32_t`, `int64_t`, `uint64_t`, `float`, `double`.
   - A fundamental type is promoted to a 1-dimensional vector if necessary.
-- In all other cases, an ambiguous type parameter is an error.
+- In all other cases, an ambiguous generic type argument is an error.
 
-It is an error when inference yields multiple options for a generic value parameter.
+It is an error when inference yields multiple options for a generic value argument.
 
-Mixing explicit and implicit parameter binding is allowed. The left-most generic parameters use the provided
+Mixing explicit and implicit parameter binding is allowed. The leftmost generic parameters use the provided
 explicit parameter bindings and the rest are inferred.
 
-> 📝 **Remark:** In case the generic parameter inference is ambiguous and `bool` is inferred as a fundamental
+> 📝 **Remark:** If the generic argument inference is ambiguous and `bool` is inferred as a fundamental
 > or element type, the behavior is currently undefined. See GitHub issue
 > [#10164](https://github.com/shader-slang/slang/issues/10164) for details.
 
