@@ -3,17 +3,24 @@
 Generics in Slang enable parameterization of [structures](types-struct.md),
 [interfaces](types-interface.md), [type aliases](types.md#alias), [functions and member functions](TODO.md),
 [subscript operators](types-struct.md#subscript-op), and
-[constructors](types-struct.md#constructor). Parameterization is allowed for types and
-`uint`/`int`/`bool`-typed values. In addition, Slang supports [generic structure
-extension](types-extension.md#generic-struct) covered in [type extensions](types-extension.md).
+[constructors](types-struct.md#constructor). A generic parameter can be a type or `uint`/`int`/`bool`-typed
+value. In addition, Slang supports [generic structure extension](types-extension.md#generic-struct), covered
+in [type extensions](types-extension.md).
 
-When the generic parameters are bound, a generic type or function is instantiated. An instantiated
-generic is a concrete type or function, which can be used like any other concrete type or
-function. Conceptually, partial parameter binding can be done by defining a generic type alias for a generic
-object, but this does not instantiate a generic.
+When the generic parameters are bound, a generic type or function is specialized. A specialized generic is a
+concrete type or function, which can be used like any other concrete type or function. Generic parameters are
+bound by providing arguments (explicit binding), by inference (implicit binding), or by a combination of both.
+Value-typed arguments to the generic parameters must be [link-time constants (TODO)](TODO.md).
+Conceptually, partial parameter binding can be done by defining a generic type alias for a generic type or
+function, but this does not specialize the generic.
 
-Slang does not directly support specialization or partial specialization of generics. However, [generic struct
-extension](types-extension.md#generic-struct) can be used to extend generic structures to similar effect.
+> 📝 **Remark 1:** Slang does not support explicit specialization of generics where a Slang program
+> would provide a definition for a specific combination of arguments. However,
+> [generic structure extension](types-extension.md#generic-struct) can be used to extend generic structures to
+> similar effect.
+
+> 📝 **Remark 2:** Slang does not currently support using interface-typed variables that require dynamic dispatch as
+> generic parameters. See GitHub issue [#10263](https://github.com/shader-slang/slang/issues/10263).
 
 
 ## Syntax
@@ -90,7 +97,7 @@ Generic parameters declaration:
 > &nbsp;&nbsp;&nbsp;&nbsp;[**`':'`** *`simple-type-spec`*]<br>
 
 
-Generic parameter conformance clause:
+Generic parameter constraint clause:
 > *`where-clause`* =<br>
 > &nbsp;&nbsp;&nbsp;&nbsp;[**`'optional'`**]<br>
 > &nbsp;&nbsp;&nbsp;&nbsp;*`simple-type-spec`*<br>
@@ -124,13 +131,14 @@ Generic parameter conformance clause:
 - *`generic-value-param-trad-decl`* declares a generic value parameter using traditional syntax.
 - *`generic-type-param-decl`* declares a generic type parameter.
 - *`generic-type-param-pack-decl`* declares a generic type parameter pack.
-- *`where-clause`* is a generic parameter conformance clause.
-- *`generic-type-constraint-decl`* is a generic parameter conformance clause, requiring the declared parameter
-  to conform to one or more constraining type expressions.
-- *`generic-type-constraint-eq-decl`* is a generic parameter conformance clause, requiring the declared parameter
-  to be equal to the constraining type expression.
-- *`generic-type-constraint-coercion-decl`* is a generic parameter conformance clause, requiring the declared parameter
-  to be coercible. This constraint may be used only in [generic structure extensions](types-extension.md#generic-struct).
+- *`where-clause`* is a generic parameter constraint clause.
+- *`generic-type-constraint-decl`* declares a generic type conformance constraint, requiring the left-hand-side
+  type expression to conform to one or more constraining type expressions.
+- *`generic-type-constraint-eq-decl`* declares a generic type equality constraint, requiring the left-hand-side
+  type expression to be equal to the right-hand-side type expression.
+- *`generic-type-constraint-coercion-decl`* declares a generic type coercion constraint, requiring the type
+  expression in parentheses to be coercible to the type expression outside the parentheses.
+  This constraint may be used only in [generic structure extensions](types-extension.md#generic-struct).
   See GitHub issue [#10087](https://github.com/shader-slang/slang/issues/10087).
 - *`identifier`*: see the respective syntax for a description.
 - *`bases-clause`*: see the respective syntax for a description.
@@ -149,8 +157,8 @@ subscript operators*, and *generic constructors*.
 
 A generic parameter declaration is one of:
 
-- Generic value parameter declaration *`generic-value-param-decl`*, which adds a value parameter with an optional
-  default value. The value type must be one of `bool`, `int`, `uint`.
+- Generic value parameter declaration *`generic-value-param-decl`* or *`generic-value-param-trad-decl`*, which
+  adds a value parameter with an optional default value. The value type must be one of `bool`, `int`, `uint`.
 - Generic type parameter declaration *`generic-type-param-decl`*, which adds a type parameter with an optional
   type constraint and an optional default type. The keyword `typename` is optional.
 - Generic type parameter pack declaration *`generic-type-param-pack-decl`*, which adds a type parameter
@@ -164,11 +172,11 @@ Types may be constrained by:
 - Specifying one or more `where` clauses (*`where-clause`*). A `where` clause adds a single requirement using
   one of the following forms:
   - Conformance constraint declaration *`generic-type-constraint-decl`* adds a requirement that the left-hand-side type
-    expression must conform to the right-hand-side type expression.
+    expression must conform to the right-hand-side type expressions.
   - Equivalence constraint declaration *`generic-type-constraint-eq-decl`* adds a requirement that the left-hand-side
     type expression must be equal to the right-hand-side type expression.
   - Coercion constraint declaration *`generic-type-constraint-coercion-decl`* adds a requirement that the parenthesized
-    type expression must be convertible to the left-hand-side type expression.
+    type expression must be coercible to the left-hand-side type expression.
 
 Conformance and equivalence constraints may be declared as optional. When optional, the expression `ParamType is
 ConstrainingType` returns `true` when `ParamType` conforms to or equals `ConstrainingType`. When the expression is used in
@@ -193,7 +201,7 @@ Value parameters cannot be constrained.
 ### Type Parameter Packs {#type-param-packs}
 
 A type parameter pack is declared using the `each TypeIdentifier` syntax. When a generic construct is
-instantiated, a (possibly empty) sequence of type arguments is bound to the parameter pack.
+specialized, a (possibly empty) sequence of type arguments is bound to the parameter pack.
 
 A type parameter pack is expanded using the `expand`/`each` construct with the following syntax:
 
@@ -203,11 +211,12 @@ A type parameter pack is expanded using the `expand`/`each` construct with the f
 > Each-expression:<br>
 > &nbsp;&nbsp;&nbsp;&nbsp;*`each-expr`* = **`'each'`** *`expr`*
 
-An each-expression evaluates to a type parameter pack, tuple, or type-parameter-pack-typed variable.
+An expression in an each-expression evaluates to a type parameter pack, tuple, or variable whose type is a
+type parameter pack.
 
 There must be at least one each-expression within an expand-expression. An each-expression must always be
 enclosed within an expand-expression except in a generic type declaration. If there are multiple
-each-expressions within an expand-expression, the referred parameter packs must all have an equal number of
+each-expressions within an expand-expression, the referenced parameter packs must all have an equal number of
 parameters.
 
 An expand-expression evaluates to a comma-separated value sequence whose length is the number of type
@@ -230,8 +239,8 @@ multiple declared expand/each parameters, in which case the type parameter packs
 
 ## Type Checking
 
-Type checking of parameterized types is performed based on their type constraints, and it is performed
-before instantiation. In general, an operation on a parameterized generic type or a generic-typed variable is legal if it is
+Type checking of parameterized types is performed based on their type constraints
+before specialization. In general, an operation on a parameterized generic type or a generic-typed variable is legal if it is
 legal for all possible concrete types conforming to the declared constraints.
 
 The rules are as follows:
@@ -241,7 +250,7 @@ The rules are as follows:
   `U`. That is, `T` implements all requirements of `U`.
 - If a parameterized type `T` has a type constraint `U(T)`, type `T` may be converted to type `U`.
 
-Type constraints may be declared for generic type parameters and type expressions including generic type
+Type constraints may be declared for generic type parameters and type expressions that include generic type
 parameters. For example, `where T : IFace where T.AssocT == int` requires that `T.AssocT` is `int`. Note that
 `IFace` must declare associated type `AssocT`. (See [interfaces](types-interface.md) for associated type
 declarations.)
@@ -250,7 +259,7 @@ No assumptions are made about generic value parameters other than their declared
 
 
 > 📝 **Remark:** In contrast to C++ templates, type checking of Slang generics is performed before
-> instantiation. In C++, type checking is performed after template instantiation.
+> specialization. In C++, type checking is performed after template specialization and instantiation.
 
 
 ## Parameter Binding
@@ -298,7 +307,6 @@ struct TestStruct<T, let size : uint>
 [numthreads(10,1,1)]
 void main(uint3 id : SV_DispatchThreadID)
 {
-
     TestStruct<float, 10> obj =
         { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
 
@@ -476,7 +484,7 @@ void main(uint3 id : SV_DispatchThreadID)
 
     outputBuffer[id.x]  = addTwoInts(intObj1, intObj2);
 
-    // FloatProperty does not conform to equivalence requirement
+    // FloatProperty does not satisfy the equivalence requirement
     // "T.PropertyType == int". Hence, the following line will
     // not compile.
     // outputBuffer[id.x] += addTwoInts(floatObj1, floatObj2);
@@ -540,10 +548,10 @@ float dotProduct<each T>
     (expand each T a, expand each T b)
     where T == float
 {
-   float r = 0.0f;
+    float r = 0.0f;
 
-   expand dotProductHelper(each a, each b, r);
-   return r;
+    expand dotProductHelper(each a, each b, r);
+    return r;
 }
 
 RWStructuredBuffer<double> outputBuffer;
