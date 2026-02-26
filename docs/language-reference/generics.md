@@ -185,6 +185,8 @@ be used as type `ConstrainingType` in the "then" branch.
 
 The coercion requirement is usable only in generic structure extensions.
 
+A constraint on a type parameter pack applies to every type in the pack.
+
 Value parameters cannot be constrained.
 
 > 📝 **Remark 1:** In Slang, a conformance requirement `TypeParam : ConstrainingType` means that `TypeParam` must
@@ -516,7 +518,8 @@ void sumHelper(inout int acc, int term)
     acc += term;
 }
 
-int sumInts<each T>(expand each T terms) where T == int
+int sumInts<each T>(expand each T terms)
+    where T == int // every 'T' type pack member must be int
 {
     int acc = 0;
     expand sumHelper(acc, each terms);
