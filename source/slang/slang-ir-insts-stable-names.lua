@@ -731,5 +731,10 @@ return {
 	["Type.MetalParameterBlockLayout"] = 729,
 	["Type.CUDALayout"] = 730,
 	["Type.LLVMLayout"] = 731,
-  ["LateRequireCapability"] = 732,
+  ["makeCombinedTextureSampler"] = 732,
+	["SPIRVResourceHeap"] = 733,
+	["SPIRVSamplerHeap"] = 734,
+	["SPIRVLoadDescriptorFromHeap"] = 735,
+	["SPIRVLoadTexelPointerFromHeap"] = 736,
+  ["LateRequireCapability"] = 737,
 }
