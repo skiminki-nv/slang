@@ -3,8 +3,9 @@
 Generics in Slang enable parameterization of [structures](types-struct.md),
 [interfaces](types-interface.md), [type aliases](types.md#alias), [functions and member functions](TODO.md),
 [subscript operators](types-struct.md#subscript-op), and
-[constructors](types-struct.md#constructor). A generic parameter can be a type or `uint`/`int`/`bool`-typed
-value. In addition, Slang supports [generic structure extension](types-extension.md#generic-struct), covered
+[constructors](types-struct.md#constructor). A generic parameter can be a type, a [Boolean](types-fundamental.md#boolean)
+value, an [integer](types-fundamental.md#integer) value, or an [enumeration (TODO)](TODO.md) value.
+In addition, Slang supports [generic structure extension](types-extension.md#generic-struct), covered
 in [type extensions](types-extension.md).
 
 When the generic parameters are bound, a generic type or function is specialized. A specialized generic is a
@@ -158,7 +159,8 @@ subscript operators*, and *generic constructors*.
 A generic parameter declaration is one of:
 
 - Generic value parameter declaration *`generic-value-param-decl`* or *`generic-value-param-trad-decl`*, which
-  adds a value parameter with an optional default value. The value type must be one of `bool`, `int`, `uint`.
+  adds a value parameter with an optional default value. The value type must be a [Boolean](types-fundamental.md#boolean),
+  an [integer](types-fundamental.md#integer), or an [enumeration (TODO)](TODO.md).
 - Generic type parameter declaration *`generic-type-param-decl`*, which adds a type parameter with an optional
   type constraint and an optional default type. The keyword `typename` is optional.
 - Generic type parameter pack declaration *`generic-type-param-pack-decl`*, which adds a type parameter
