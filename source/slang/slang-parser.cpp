@@ -6793,6 +6793,8 @@ RequireCapabilityStmt* Parser::ParseRequireCapabilityStatement()
     while (true)
     {
         Token capToken = ReadToken(TokenType::Identifier);
+        if (capToken.type != TokenType::Identifier)
+            break;
 
         UnownedStringSlice capNameStr = capToken.getContent();
         CapabilityName capName = findCapabilityName(capNameStr);
@@ -6801,10 +6803,8 @@ RequireCapabilityStmt* Parser::ParseRequireCapabilityStatement()
         else
             sink->diagnose(capToken, Diagnostics::unknownCapability, capNameStr);
 
-        if (!LookAheadToken(TokenType::Comma))
+        if (!AdvanceIf(this, TokenType::Comma))
             break;
-
-        ReadToken(TokenType::Comma);
     }
 
     ReadToken(TokenType::RParent);
