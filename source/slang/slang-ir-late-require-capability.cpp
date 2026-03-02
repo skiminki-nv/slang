@@ -12,9 +12,6 @@
 namespace Slang
 {
 
-// TODO: This needs to come from a header
-void diagnoseCallStack(IRInst* inst, DiagnosticSink* sink);
-
 struct ProcessLateRequireCapabilityInstsContext
 {
     IRModule* const m_module;
